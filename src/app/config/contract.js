@@ -1,6 +1,6 @@
 const senderContract = {
     name: "Sender",
-    address: "0xBb95A888B4EBF96f8A7279Ea7A49A69cd4b12Ac9",  // Deployed on Avalanche Fuji
+    address: "0xbb95a888b4ebf96f8a7279ea7a49a69cd4b12ac9",  // Deployed on Polygon Amoy
     abi: [
         {
             "inputs": [

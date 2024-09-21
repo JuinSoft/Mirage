@@ -2,14 +2,15 @@
 
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Bell, Gift, Settings, User, MessageSquare, ChevronDown, Search, Paperclip, Send } from 'lucide-react';
-import { DynamicWidget, useDynamicContext } from '@dynamic-labs/sdk-react-core';
+import { Bell, Gift, Settings, User, MessageSquare, ChevronDown, Search, Paperclip, Send, X } from 'lucide-react';
+import { DynamicWidget, useDynamicContext, useSwitchNetwork } from '@dynamic-labs/sdk-react-core';
 import { useRouter } from 'next/navigation';
 import useContracts from './hooks/useContracts';
 import { sendFileToIPFS } from './config/sendFileToIPFS';
 import { ethers } from 'ethers';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import ContactManager from './components/Contacts';
 
 const sidebarItems = [
   {
@@ -46,7 +47,15 @@ const dummyEmails = [
   { id: 5, from: 'eve@example.com', subject: 'Crypto Market Update', preview: 'Here\'s your weekly crypto market analysis and insights...', date: '1 week ago' },
 ];
 
+
+// Chain IDs
+const POLYGON_AMAY_CHAIN_ID = 80002;
+const ETHEREUM_SEPOLIA_CHAIN_ID = 11155111;
+
 export default function Home() {
+
+  // States
+  const { primaryWallet } = useDynamicContext();
   const [activeTab, setActiveTab] = useState('Inbox');
   const [showCompose, setShowCompose] = useState(false);
   const [selectedEmail, setSelectedEmail] = useState(null);
@@ -56,10 +65,13 @@ export default function Home() {
   const [message, setMessage] = useState('Hello world');
   const [attachment, setAttachment] = useState(null);
   const [usdcAmount, setUsdcAmount] = useState('1');
+  const [showContacts, setShowContacts] = useState(false); 
   const { user, handleLogOut } = useDynamicContext();
   const router = useRouter();
   const { provider, signer, contracts } = useContracts();
+  const switchNetwork = useSwitchNetwork();
 
+  // Effects
   useEffect(() => {
     if (!user) {
       console.log("Not authenticated, redirecting to login");
@@ -77,6 +89,23 @@ export default function Home() {
   };
 
 
+  const handleSwitchNetwork = async (networkId) => {
+    try {
+      if (primaryWallet) {
+        await switchNetwork({ wallet: primaryWallet, network: networkId });
+        return true;
+      } else {
+        console.error('Primary wallet is not available');
+        return false;
+      }
+    } catch (error) {
+      console.error('Error switching network:', error);
+      return false;
+    }
+  };
+
+
+
   const handleSendMessage = async () => {
     try {
       if (!to || !subject || !message) {
@@ -86,44 +115,46 @@ export default function Home() {
 
       let attachmentUrl = '';
       if (attachment) {
-        const { url } = await sendFileToIPFS(attachment);
+        const { url } = "test" // await sendFileToIPFS(attachment);
         attachmentUrl = url;
+        console.log("Attachment URL:", attachmentUrl);
       }
 
       if (usdcAmount) {
-        // Switch to Avalanche Fuji network
-        await window.ethereum.request({
-          method: 'wallet_switchEthereumChain',
-          params: [{ chainId: '0xA869' }], // Avalanche Fuji chain ID in hexadecimal
-        });
+        // Switch to Polygon Amoy network
+        // await window.ethereum.request({
+        //   method: 'wallet_switchEthereumChain',
+        //   params: [{ chainId: '0x13882' }], // Polygon Amoy chain ID in hexadecimal
+        // });
 
-        const tx = await contracts.senderContract.sendMessagePayLINK(
-          ethers.BigNumber.from("16015286601757825753"), // Ethereum Sepolia chain selector
-          to,
-          ethers.BigNumber.from("1000000") // 1 USDC
-        );
-        await tx.wait();
+        // const tx = await contracts.senderContract.sendMessagePayLINK(
+        //   ethers.BigNumber.from("16015286601757825753"), // Ethereum Sepolia chain selector
+        //   to,
+        //   ethers.BigNumber.from("1000000") // 1 USDC
+        // );
+        // await tx.wait();
+        // console.log("Transaction sent successfully:", tx);
+        // await switchNetwork(POLYGON_AMAY_CHAIN_ID);
+
+        // await for 2 seconds
+        const switchedToPolygon = await handleSwitchNetwork(POLYGON_AMAY_CHAIN_ID);
+        if (!switchedToPolygon) {
+          toast.error('Failed to switch to Polygon network.');
+          return;
+        }
+        await new Promise(resolve => setTimeout(resolve, 2000));
+        console.log("Transaction sent successfully after 2 seconds for Polygon Amoy: ", ethers.utils.parseUnits(usdcAmount || '0', 6));
       }
 
       // Switch to Ethereum Sepolia network
-      await window.ethereum.request({
-        method: 'wallet_switchEthereumChain',
-        params: [{ chainId: '0xaa36a7' }], // Ethereum Sepolia chain ID in hexadecimal
-      });
+      // const switchNetwork = await window.ethereum.request({
+      //   method: 'wallet_switchEthereumChain',
+      //   params: [{ chainId: '0xaa36a7' }], // Ethereum Sepolia chain ID in hexadecimal
+      // });
 
-      let gasEstimate;
-      try {
-        gasEstimate = await contracts.messageContract.estimateGas.sendMessage(
-          to,
-          subject,
-          message,
-          attachmentUrl,
-          !!usdcAmount,
-          ethers.utils.parseUnits(usdcAmount || '0', 6)
-        );
-      } catch (error) {
-        console.error('Error estimating gas:', error);
-        toast.error('Error estimating gas. Please try again.');
+      const switchedToEthereum = await handleSwitchNetwork(ETHEREUM_SEPOLIA_CHAIN_ID);
+      if (!switchedToEthereum) {
+        toast.error('Failed to switch to Ethereum network.');
         return;
       }
 
@@ -133,10 +164,10 @@ export default function Home() {
         message,
         attachmentUrl,
         !!usdcAmount,
-        ethers.utils.parseUnits(usdcAmount || '0', 6),
-        { gasLimit: gasEstimate }
+        ethers.utils.parseUnits(usdcAmount || '0', 6)
       );
       await tx.wait();
+      console.log("Transaction sent successfully:", tx);
 
       toast.success('Message sent successfully!');
       setShowCompose(false);
@@ -174,7 +205,7 @@ export default function Home() {
           <motion.button
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
-            onClick={() => setShowCompose(true)}
+            onClick={() => { setShowCompose(true); }}
             className="bg-[#D63C5E] text-white py-2 px-4 rounded-full mb-6 font-bold"
           >
             Compose
@@ -201,7 +232,7 @@ export default function Home() {
             className="bg-white text-[#121212] p-4 flex justify-between items-center"
           >
             <div className="flex space-x-4">
-              <button className="px-4 py-2 rounded-full flex items-center bg-gray-200">
+              <button className="px-4 py-2 rounded-full flex items-center bg-gray-200" onClick={() => setShowContacts(true)}>
                 <img src="/assets_png/traits-svg/3-heads/head-cordlessphone.svg" width="32" height="32" alt="Spam" style={{ transform: 'rotate(90deg)' }} className="mr-2" />
                 Contacts
               </button>
@@ -232,8 +263,14 @@ export default function Home() {
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: 50 }}
                   transition={{ duration: 0.5 }}
-                  className="bg-white rounded-lg p-6 shadow-lg"
+                  className="bg-white rounded-lg p-6 shadow-lg relative"
                 >
+                  <button
+                    className="absolute top-2 right-2 text-gray-500 hover:text-gray-700"
+                    onClick={() => setShowCompose(false)}
+                  >
+                    <X size={24} />
+                  </button>
                   <h2 className="text-2xl font-bold mb-4 text-[#121212] flex items-center">
                     <img src="/assets_png/traits-svg/3-heads/head-factory-dark.svg" width="60" height="60" alt="Compose" className="mr-2" />
                     Compose Email
@@ -345,6 +382,7 @@ export default function Home() {
           </main>
         </div>
       </div>
+      {showContacts && <ContactManager onClose={() => setShowContacts(false)} />}
       <ToastContainer />
     </>
   );
