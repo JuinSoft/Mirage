@@ -2,11 +2,35 @@
 @tailwind components;
 @tailwind utilities;
 
+/* styles/fonts.css */
+/* @font-face {
+  font-family: 'Silkscreen';
+  src: url('/fonts/Silkscreen/Silkscreen-Regular.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Silkscreen';
+  src: url('/fonts/Silkscreen/Silkscreen-Bold.ttf') format('truetype');
+  font-weight: bold;
+  font-style: normal;
+} */
+
 :root {
   --background: #ffffff;
   --foreground: #171717;
+  --font-silkscreen-regular: 'Silkscreen', sans-serif;
+  --font-silkscreen-bold: 'Silkscreen Bold', sans-serif;
 }
 
+.font-silkscreen {
+  font-family: var(--font-silkscreen-regular);
+}
+
+.font-silkscreen-bold {
+  font-family: var(--font-silkscreen-bold);
+}
 @media (prefers-color-scheme: dark) {
   :root {
     --background: #0a0a0a;
@@ -17,7 +41,7 @@
 body {
   color: var(--foreground);
   background: var(--background);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-silkscreen-regular), Arial, Helvetica, sans-serif;
 }
 
 @layer utilities {
