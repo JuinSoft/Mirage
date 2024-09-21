@@ -1292,9 +1292,809 @@ const stakerContract = {
 };
 
 const messageContract = {
-    name: "Message",
-    address: "",
-    abi: abi,
+    name: "Mirage",
+    address: "0x006091931931b82128Cb7b97a70705870f2eA4ac",  // Deployed on Ethereum Sepolia
+    abi: [
+        {
+            "inputs": [
+                {
+                    "internalType": "address",
+                    "name": "_user",
+                    "type": "address"
+                },
+                {
+                    "components": [
+                        {
+                            "internalType": "address",
+                            "name": "account",
+                            "type": "address"
+                        },
+                        {
+                            "internalType": "string",
+                            "name": "email",
+                            "type": "string"
+                        },
+                        {
+                            "internalType": "string",
+                            "name": "chainId",
+                            "type": "string"
+                        }
+                    ],
+                    "internalType": "struct Mirage.Contact",
+                    "name": "_contact",
+                    "type": "tuple"
+                }
+            ],
+            "name": "addUserContact",
+            "outputs": [],
+            "stateMutability": "nonpayable",
+            "type": "function"
+        },
+        {
+            "anonymous": false,
+            "inputs": [
+                {
+                    "indexed": true,
+                    "internalType": "address",
+                    "name": "receiver",
+                    "type": "address"
+                },
+                {
+                    "indexed": false,
+                    "internalType": "string",
+                    "name": "senderEmail",
+                    "type": "string"
+                },
+                {
+                    "indexed": false,
+                    "internalType": "bool",
+                    "name": "status",
+                    "type": "bool"
+                }
+            ],
+            "name": "AttestationProvided",
+            "type": "event"
+        },
+        {
+            "anonymous": false,
+            "inputs": [
+                {
+                    "indexed": true,
+                    "internalType": "address",
+                    "name": "sender",
+                    "type": "address"
+                },
+                {
+                    "indexed": false,
+                    "internalType": "string",
+                    "name": "receiverEmail",
+                    "type": "string"
+                }
+            ],
+            "name": "AttestationRequested",
+            "type": "event"
+        },
+        {
+            "inputs": [
+                {
+                    "internalType": "uint256",
+                    "name": "messageId",
+                    "type": "uint256"
+                }
+            ],
+            "name": "deleteMessage",
+            "outputs": [],
+            "stateMutability": "nonpayable",
+            "type": "function"
+        },
+        {
+            "anonymous": false,
+            "inputs": [
+                {
+                    "indexed": true,
+                    "internalType": "address",
+                    "name": "user",
+                    "type": "address"
+                },
+                {
+                    "indexed": false,
+                    "internalType": "uint256",
+                    "name": "messageId",
+                    "type": "uint256"
+                }
+            ],
+            "name": "MessageDeleted",
+            "type": "event"
+        },
+        {
+            "anonymous": false,
+            "inputs": [
+                {
+                    "indexed": true,
+                    "internalType": "address",
+                    "name": "user",
+                    "type": "address"
+                },
+                {
+                    "indexed": false,
+                    "internalType": "uint256",
+                    "name": "messageId",
+                    "type": "uint256"
+                }
+            ],
+            "name": "MessageRead",
+            "type": "event"
+        },
+        {
+            "anonymous": false,
+            "inputs": [
+                {
+                    "indexed": true,
+                    "internalType": "address",
+                    "name": "sender",
+                    "type": "address"
+                },
+                {
+                    "indexed": true,
+                    "internalType": "address",
+                    "name": "receiver",
+                    "type": "address"
+                },
+                {
+                    "indexed": false,
+                    "internalType": "uint256",
+                    "name": "messageId",
+                    "type": "uint256"
+                }
+            ],
+            "name": "MessageSent",
+            "type": "event"
+        },
+        {
+            "anonymous": false,
+            "inputs": [
+                {
+                    "indexed": true,
+                    "internalType": "address",
+                    "name": "user",
+                    "type": "address"
+                },
+                {
+                    "indexed": false,
+                    "internalType": "uint256",
+                    "name": "messageId",
+                    "type": "uint256"
+                },
+                {
+                    "indexed": false,
+                    "internalType": "bool",
+                    "name": "verified",
+                    "type": "bool"
+                }
+            ],
+            "name": "MessageVerified",
+            "type": "event"
+        },
+        {
+            "inputs": [
+                {
+                    "internalType": "string",
+                    "name": "_senderEmail",
+                    "type": "string"
+                },
+                {
+                    "internalType": "bool",
+                    "name": "_status",
+                    "type": "bool"
+                }
+            ],
+            "name": "provideAttestation",
+            "outputs": [],
+            "stateMutability": "nonpayable",
+            "type": "function"
+        },
+        {
+            "inputs": [
+                {
+                    "internalType": "address",
+                    "name": "_receiver",
+                    "type": "address"
+                },
+                {
+                    "internalType": "string",
+                    "name": "_subject",
+                    "type": "string"
+                },
+                {
+                    "internalType": "string",
+                    "name": "_content",
+                    "type": "string"
+                },
+                {
+                    "internalType": "string",
+                    "name": "_imageHash",
+                    "type": "string"
+                },
+                {
+                    "internalType": "bool",
+                    "name": "_asset",
+                    "type": "bool"
+                },
+                {
+                    "internalType": "uint256",
+                    "name": "_assetAmount",
+                    "type": "uint256"
+                }
+            ],
+            "name": "sendMessage",
+            "outputs": [],
+            "stateMutability": "nonpayable",
+            "type": "function"
+        },
+        {
+            "inputs": [
+                {
+                    "internalType": "address",
+                    "name": "_receiver",
+                    "type": "address"
+                },
+                {
+                    "internalType": "string",
+                    "name": "_receiverEmail",
+                    "type": "string"
+                },
+                {
+                    "internalType": "bool",
+                    "name": "_attestation",
+                    "type": "bool"
+                }
+            ],
+            "name": "setAttestation",
+            "outputs": [],
+            "stateMutability": "nonpayable",
+            "type": "function"
+        },
+        {
+            "inputs": [
+                {
+                    "internalType": "uint256",
+                    "name": "messageId",
+                    "type": "uint256"
+                },
+                {
+                    "internalType": "bool",
+                    "name": "_isRead",
+                    "type": "bool"
+                }
+            ],
+            "name": "setReadStatus",
+            "outputs": [],
+            "stateMutability": "nonpayable",
+            "type": "function"
+        },
+        {
+            "inputs": [
+                {
+                    "internalType": "address",
+                    "name": "_user",
+                    "type": "address"
+                },
+                {
+                    "internalType": "string",
+                    "name": "_email",
+                    "type": "string"
+                }
+            ],
+            "name": "setUserEmail",
+            "outputs": [],
+            "stateMutability": "nonpayable",
+            "type": "function"
+        },
+        {
+            "inputs": [
+                {
+                    "internalType": "uint256",
+                    "name": "messageId",
+                    "type": "uint256"
+                },
+                {
+                    "internalType": "bool",
+                    "name": "_isVerified",
+                    "type": "bool"
+                }
+            ],
+            "name": "setVerificationStatus",
+            "outputs": [],
+            "stateMutability": "nonpayable",
+            "type": "function"
+        },
+        {
+            "inputs": [
+                {
+                    "internalType": "address",
+                    "name": "",
+                    "type": "address"
+                },
+                {
+                    "internalType": "string",
+                    "name": "",
+                    "type": "string"
+                }
+            ],
+            "name": "attestation",
+            "outputs": [
+                {
+                    "internalType": "bool",
+                    "name": "",
+                    "type": "bool"
+                }
+            ],
+            "stateMutability": "view",
+            "type": "function"
+        },
+        {
+            "inputs": [
+                {
+                    "internalType": "string",
+                    "name": "",
+                    "type": "string"
+                }
+            ],
+            "name": "emailToAddress",
+            "outputs": [
+                {
+                    "internalType": "address",
+                    "name": "",
+                    "type": "address"
+                }
+            ],
+            "stateMutability": "view",
+            "type": "function"
+        },
+        {
+            "inputs": [
+                {
+                    "internalType": "address",
+                    "name": "_sender",
+                    "type": "address"
+                },
+                {
+                    "internalType": "string",
+                    "name": "_receiverEmail",
+                    "type": "string"
+                }
+            ],
+            "name": "getAttestation",
+            "outputs": [
+                {
+                    "internalType": "bool",
+                    "name": "",
+                    "type": "bool"
+                }
+            ],
+            "stateMutability": "view",
+            "type": "function"
+        },
+        {
+            "inputs": [
+                {
+                    "internalType": "string",
+                    "name": "_receiverEmail",
+                    "type": "string"
+                }
+            ],
+            "name": "getAttestationRequests",
+            "outputs": [
+                {
+                    "internalType": "address[]",
+                    "name": "",
+                    "type": "address[]"
+                },
+                {
+                    "internalType": "bool[]",
+                    "name": "",
+                    "type": "bool[]"
+                }
+            ],
+            "stateMutability": "view",
+            "type": "function"
+        },
+        {
+            "inputs": [
+                {
+                    "internalType": "uint256",
+                    "name": "messageId",
+                    "type": "uint256"
+                }
+            ],
+            "name": "getMessageById",
+            "outputs": [
+                {
+                    "components": [
+                        {
+                            "internalType": "address",
+                            "name": "sender",
+                            "type": "address"
+                        },
+                        {
+                            "internalType": "address",
+                            "name": "receiver",
+                            "type": "address"
+                        },
+                        {
+                            "internalType": "string",
+                            "name": "subject",
+                            "type": "string"
+                        },
+                        {
+                            "internalType": "string",
+                            "name": "content",
+                            "type": "string"
+                        },
+                        {
+                            "internalType": "string",
+                            "name": "imageHash",
+                            "type": "string"
+                        },
+                        {
+                            "internalType": "uint256",
+                            "name": "timestamp",
+                            "type": "uint256"
+                        },
+                        {
+                            "internalType": "bool",
+                            "name": "isDeleted",
+                            "type": "bool"
+                        },
+                        {
+                            "internalType": "bool",
+                            "name": "asset",
+                            "type": "bool"
+                        },
+                        {
+                            "internalType": "uint256",
+                            "name": "assetAmount",
+                            "type": "uint256"
+                        },
+                        {
+                            "internalType": "bool",
+                            "name": "isRead",
+                            "type": "bool"
+                        }
+                    ],
+                    "internalType": "struct Mirage.Message",
+                    "name": "",
+                    "type": "tuple"
+                }
+            ],
+            "stateMutability": "view",
+            "type": "function"
+        },
+        {
+            "inputs": [
+                {
+                    "internalType": "address",
+                    "name": "_user",
+                    "type": "address"
+                }
+            ],
+            "name": "getUserContacts",
+            "outputs": [
+                {
+                    "components": [
+                        {
+                            "internalType": "address",
+                            "name": "account",
+                            "type": "address"
+                        },
+                        {
+                            "internalType": "string",
+                            "name": "email",
+                            "type": "string"
+                        },
+                        {
+                            "internalType": "string",
+                            "name": "chainId",
+                            "type": "string"
+                        }
+                    ],
+                    "internalType": "struct Mirage.Contact[]",
+                    "name": "",
+                    "type": "tuple[]"
+                }
+            ],
+            "stateMutability": "view",
+            "type": "function"
+        },
+        {
+            "inputs": [
+                {
+                    "internalType": "address",
+                    "name": "_user",
+                    "type": "address"
+                }
+            ],
+            "name": "getUserEmail",
+            "outputs": [
+                {
+                    "internalType": "string",
+                    "name": "",
+                    "type": "string"
+                }
+            ],
+            "stateMutability": "view",
+            "type": "function"
+        },
+        {
+            "inputs": [
+                {
+                    "internalType": "address",
+                    "name": "_user",
+                    "type": "address"
+                }
+            ],
+            "name": "getUserInbox",
+            "outputs": [
+                {
+                    "components": [
+                        {
+                            "internalType": "address",
+                            "name": "sender",
+                            "type": "address"
+                        },
+                        {
+                            "internalType": "address",
+                            "name": "receiver",
+                            "type": "address"
+                        },
+                        {
+                            "internalType": "string",
+                            "name": "subject",
+                            "type": "string"
+                        },
+                        {
+                            "internalType": "string",
+                            "name": "content",
+                            "type": "string"
+                        },
+                        {
+                            "internalType": "string",
+                            "name": "imageHash",
+                            "type": "string"
+                        },
+                        {
+                            "internalType": "uint256",
+                            "name": "timestamp",
+                            "type": "uint256"
+                        },
+                        {
+                            "internalType": "bool",
+                            "name": "isDeleted",
+                            "type": "bool"
+                        },
+                        {
+                            "internalType": "bool",
+                            "name": "asset",
+                            "type": "bool"
+                        },
+                        {
+                            "internalType": "uint256",
+                            "name": "assetAmount",
+                            "type": "uint256"
+                        },
+                        {
+                            "internalType": "bool",
+                            "name": "isRead",
+                            "type": "bool"
+                        }
+                    ],
+                    "internalType": "struct Mirage.Message[]",
+                    "name": "",
+                    "type": "tuple[]"
+                }
+            ],
+            "stateMutability": "view",
+            "type": "function"
+        },
+        {
+            "inputs": [
+                {
+                    "internalType": "uint256",
+                    "name": "messageId",
+                    "type": "uint256"
+                }
+            ],
+            "name": "isMessageRead",
+            "outputs": [
+                {
+                    "internalType": "bool",
+                    "name": "",
+                    "type": "bool"
+                }
+            ],
+            "stateMutability": "view",
+            "type": "function"
+        },
+        {
+            "inputs": [
+                {
+                    "internalType": "uint256",
+                    "name": "",
+                    "type": "uint256"
+                }
+            ],
+            "name": "isRedeemed",
+            "outputs": [
+                {
+                    "internalType": "bool",
+                    "name": "",
+                    "type": "bool"
+                }
+            ],
+            "stateMutability": "view",
+            "type": "function"
+        },
+        {
+            "inputs": [
+                {
+                    "internalType": "uint256",
+                    "name": "",
+                    "type": "uint256"
+                }
+            ],
+            "name": "isVerified",
+            "outputs": [
+                {
+                    "internalType": "bool",
+                    "name": "",
+                    "type": "bool"
+                }
+            ],
+            "stateMutability": "view",
+            "type": "function"
+        },
+        {
+            "inputs": [
+                {
+                    "internalType": "uint256",
+                    "name": "",
+                    "type": "uint256"
+                }
+            ],
+            "name": "messages",
+            "outputs": [
+                {
+                    "internalType": "address",
+                    "name": "sender",
+                    "type": "address"
+                },
+                {
+                    "internalType": "address",
+                    "name": "receiver",
+                    "type": "address"
+                },
+                {
+                    "internalType": "string",
+                    "name": "subject",
+                    "type": "string"
+                },
+                {
+                    "internalType": "string",
+                    "name": "content",
+                    "type": "string"
+                },
+                {
+                    "internalType": "string",
+                    "name": "imageHash",
+                    "type": "string"
+                },
+                {
+                    "internalType": "uint256",
+                    "name": "timestamp",
+                    "type": "uint256"
+                },
+                {
+                    "internalType": "bool",
+                    "name": "isDeleted",
+                    "type": "bool"
+                },
+                {
+                    "internalType": "bool",
+                    "name": "asset",
+                    "type": "bool"
+                },
+                {
+                    "internalType": "uint256",
+                    "name": "assetAmount",
+                    "type": "uint256"
+                },
+                {
+                    "internalType": "bool",
+                    "name": "isRead",
+                    "type": "bool"
+                }
+            ],
+            "stateMutability": "view",
+            "type": "function"
+        },
+        {
+            "inputs": [
+                {
+                    "internalType": "address",
+                    "name": "",
+                    "type": "address"
+                },
+                {
+                    "internalType": "uint256",
+                    "name": "",
+                    "type": "uint256"
+                }
+            ],
+            "name": "userContacts",
+            "outputs": [
+                {
+                    "internalType": "address",
+                    "name": "account",
+                    "type": "address"
+                },
+                {
+                    "internalType": "string",
+                    "name": "email",
+                    "type": "string"
+                },
+                {
+                    "internalType": "string",
+                    "name": "chainId",
+                    "type": "string"
+                }
+            ],
+            "stateMutability": "view",
+            "type": "function"
+        },
+        {
+            "inputs": [
+                {
+                    "internalType": "address",
+                    "name": "",
+                    "type": "address"
+                }
+            ],
+            "name": "userEmails",
+            "outputs": [
+                {
+                    "internalType": "string",
+                    "name": "",
+                    "type": "string"
+                }
+            ],
+            "stateMutability": "view",
+            "type": "function"
+        },
+        {
+            "inputs": [
+                {
+                    "internalType": "address",
+                    "name": "",
+                    "type": "address"
+                },
+                {
+                    "internalType": "uint256",
+                    "name": "",
+                    "type": "uint256"
+                }
+            ],
+            "name": "userMessages",
+            "outputs": [
+                {
+                    "internalType": "uint256",
+                    "name": "",
+                    "type": "uint256"
+                }
+            ],
+            "stateMutability": "view",
+            "type": "function"
+        }
+    ],
 };
 
 export default { senderContract, receiverContract, stakerContract, messageContract };
