@@ -50,21 +50,6 @@ export default function ContactManager() {
         }
     };
 
-    const fetchAttestationRequests = async () => {
-        try {
-            const userAddress = await signer.getAddress();
-            const userEmail = user.email;
-            const requests = await contracts.messageContract.getAttestationRequests(userEmail);
-            console.log("Fetched attestation requests: ", requests);
-            if (requests[0].length > 0) {
-                setAttestationRequests(requests[0]);
-                setAttestationStatuses(requests[1]);
-            }
-        } catch (error) {
-            console.error('Error fetching attestation requests:', error);
-        }
-    };
-
     const addContact = async () => {
         if (newContact.account && newContact.email && newContact.chainId) {
             try {
@@ -86,6 +71,16 @@ export default function ContactManager() {
         }
     };
 
+    const isContactVerified = async (email) => {
+        try {
+            const userAddress = await signer.getAddress();
+            return await contracts.messageContract.isContactVerified(userAddress, email);
+        } catch (error) {
+            console.error('Error checking contact verification:', error);
+            return false;
+        }
+    };
+
     const toggleVerification = async (index) => {
         try {
             const switched = await handleSwitchNetwork(ETHEREUM_SEPOLIA_CHAIN_ID);
@@ -95,7 +90,7 @@ export default function ContactManager() {
             }
 
             const contact = contacts[index];
-            const tx = await contracts.messageContract.setVerificationStatus(index, !contact.verified);
+            const tx = await contracts.messageContract.setContactVerified(await signer.getAddress(), contact.email, !contact.verified);
             await tx.wait();
 
             const updatedContacts = [...contacts];
@@ -108,15 +103,31 @@ export default function ContactManager() {
         }
     };
 
-    const handleAttestation = async (requester, receiverEmail) => {
+    const fetchAttestationRequests = async () => {
         try {
             const userAddress = await signer.getAddress();
-            const userEmail = await contracts.messageContract.getUserEmail(userAddress);
-            const success = await createEmailAttestation(userEmail, receiverEmail, userAddress, requester, true, 0, Date.now(), signer);
+            const requests = await contracts.messageContract.getVerificationRequests(userAddress);
+            setAttestationRequests(requests);
+            console.log("Fetched attestation requests: ", requests);
+        } catch (error) {
+            console.error('Error fetching attestation requests:', error);
+        }
+    };
+
+    const handleAttestation = async (requester, receiverEmail) => {
+        try {
+            const verified = await isContactVerified(receiverEmail);
+            if (verified) {
+                toast.info('Contact is already verified.');
+                return;
+            }
+
+            const userAddress = await signer.getAddress();
+            const userEmail = user.email;
+            const success = await createEmailAttestation(userEmail, receiverEmail, userAddress, requester, true, Math.floor(Math.random() * 1000000).toString(), Date.now(), signer);
             if (success) {
-                await contracts.messageContract.provideAttestation(receiverEmail, true);
-                toast.success('Attestation provided successfully!');
-                fetchAttestationRequests();
+                await contracts.messageContract.setContactVerified(userAddress, receiverEmail, true);
+                toast.success('Attestation provided and contact verified successfully!');
             } else {
                 toast.error('Failed to provide attestation.');
             }
@@ -234,6 +245,12 @@ export default function ContactManager() {
                         ))
                     )}
                 </AnimatePresence>
+                <button
+                    className="mt-4 bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    onClick={() => handleAttestation(user.email, user.email)}
+                >
+                    Attest Contact List
+                </button>
             </div>
 
             <div className="bg-gray-800 shadow-md rounded-lg p-6">

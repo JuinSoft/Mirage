@@ -18,7 +18,7 @@ async function createEmailAttestation(senderEmail="not required", receiverEmail,
             messageId,
             timestamp
         },
-        indexingValue: signer.toLowerCase()
+        indexingValue: signer.toString().toLowerCase()
     });
 
     if(res.attestationId){

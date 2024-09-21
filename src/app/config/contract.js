@@ -1293,77 +1293,8 @@ const stakerContract = {
 
 const messageContract = {
     name: "Mirage",
-    address: "0x360A845b277D8b5F8628562A6A7F6B6eEB9789d4",  // Deployed on Ethereum Sepolia
+    address: "0x719CB4fB145d08CB2Ef7E2608DF17aAAf8Edd4eD",  // Deployed on Ethereum Sepolia
     abi: [
-        {
-            "anonymous": false,
-            "inputs": [
-                {
-                    "indexed": true,
-                    "internalType": "address",
-                    "name": "sender",
-                    "type": "address"
-                },
-                {
-                    "indexed": true,
-                    "internalType": "address",
-                    "name": "receiver",
-                    "type": "address"
-                },
-                {
-                    "indexed": false,
-                    "internalType": "bool",
-                    "name": "status",
-                    "type": "bool"
-                }
-            ],
-            "name": "AllAttestations",
-            "type": "event"
-        },
-        {
-            "anonymous": false,
-            "inputs": [
-                {
-                    "indexed": true,
-                    "internalType": "address",
-                    "name": "receiver",
-                    "type": "address"
-                },
-                {
-                    "indexed": false,
-                    "internalType": "string",
-                    "name": "senderEmail",
-                    "type": "string"
-                },
-                {
-                    "indexed": false,
-                    "internalType": "bool",
-                    "name": "status",
-                    "type": "bool"
-                }
-            ],
-            "name": "AttestationProvided",
-            "type": "event"
-        },
-        {
-            "anonymous": false,
-            "inputs": [
-                {
-                    "indexed": true,
-                    "internalType": "address",
-                    "name": "sender",
-                    "type": "address"
-                },
-                {
-                    "indexed": false,
-                    "internalType": "string",
-                    "name": "receiverEmail",
-                    "type": "string"
-                }
-            ],
-            "name": "AttestationRequested",
-            "type": "event"
-        },
         {
             "anonymous": false,
             "inputs": [
@@ -1475,6 +1406,11 @@ const messageContract = {
                             "internalType": "string",
                             "name": "chainId",
                             "type": "string"
+                        },
+                        {
+                            "internalType": "bool",
+                            "name": "verified",
+                            "type": "bool"
                         }
                     ],
                     "internalType": "struct Mirage.Contact",
@@ -1485,30 +1421,6 @@ const messageContract = {
             "name": "addUserContact",
             "outputs": [],
             "stateMutability": "nonpayable",
-            "type": "function"
-        },
-        {
-            "inputs": [
-                {
-                    "internalType": "address",
-                    "name": "",
-                    "type": "address"
-                },
-                {
-                    "internalType": "string",
-                    "name": "",
-                    "type": "string"
-                }
-            ],
-            "name": "attestation",
-            "outputs": [
-                {
-                    "internalType": "bool",
-                    "name": "",
-                    "type": "bool"
-                }
-            ],
-            "stateMutability": "view",
             "type": "function"
         },
         {
@@ -1538,87 +1450,6 @@ const messageContract = {
                     "internalType": "address",
                     "name": "",
                     "type": "address"
-                }
-            ],
-            "stateMutability": "view",
-            "type": "function"
-        },
-        {
-            "inputs": [],
-            "name": "getAllAttestations",
-            "outputs": [
-                {
-                    "internalType": "address[]",
-                    "name": "",
-                    "type": "address[]"
-                },
-                {
-                    "internalType": "string[]",
-                    "name": "",
-                    "type": "string[]"
-                },
-                {
-                    "internalType": "address[]",
-                    "name": "",
-                    "type": "address[]"
-                },
-                {
-                    "internalType": "string[]",
-                    "name": "",
-                    "type": "string[]"
-                },
-                {
-                    "internalType": "bool[]",
-                    "name": "",
-                    "type": "bool[]"
-                }
-            ],
-            "stateMutability": "view",
-            "type": "function"
-        },
-        {
-            "inputs": [
-                {
-                    "internalType": "address",
-                    "name": "_sender",
-                    "type": "address"
-                },
-                {
-                    "internalType": "string",
-                    "name": "_receiverEmail",
-                    "type": "string"
-                }
-            ],
-            "name": "getAttestation",
-            "outputs": [
-                {
-                    "internalType": "bool",
-                    "name": "",
-                    "type": "bool"
-                }
-            ],
-            "stateMutability": "view",
-            "type": "function"
-        },
-        {
-            "inputs": [
-                {
-                    "internalType": "string",
-                    "name": "_receiverEmail",
-                    "type": "string"
-                }
-            ],
-            "name": "getAttestationRequests",
-            "outputs": [
-                {
-                    "internalType": "address[]",
-                    "name": "",
-                    "type": "address[]"
-                },
-                {
-                    "internalType": "bool[]",
-                    "name": "",
-                    "type": "bool[]"
                 }
             ],
             "stateMutability": "view",
@@ -1721,6 +1552,11 @@ const messageContract = {
                             "internalType": "string",
                             "name": "chainId",
                             "type": "string"
+                        },
+                        {
+                            "internalType": "bool",
+                            "name": "verified",
+                            "type": "bool"
                         }
                     ],
                     "internalType": "struct Mirage.Contact[]",
@@ -1816,6 +1652,71 @@ const messageContract = {
                     "internalType": "struct Mirage.Message[]",
                     "name": "",
                     "type": "tuple[]"
+                }
+            ],
+            "stateMutability": "view",
+            "type": "function"
+        },
+        {
+            "inputs": [
+                {
+                    "internalType": "address",
+                    "name": "_user",
+                    "type": "address"
+                }
+            ],
+            "name": "getVerificationRequests",
+            "outputs": [
+                {
+                    "components": [
+                        {
+                            "internalType": "address",
+                            "name": "requester",
+                            "type": "address"
+                        },
+                        {
+                            "internalType": "string",
+                            "name": "email",
+                            "type": "string"
+                        },
+                        {
+                            "internalType": "string",
+                            "name": "chainId",
+                            "type": "string"
+                        },
+                        {
+                            "internalType": "address",
+                            "name": "contact",
+                            "type": "address"
+                        }
+                    ],
+                    "internalType": "struct Mirage.VerificationRequest[]",
+                    "name": "",
+                    "type": "tuple[]"
+                }
+            ],
+            "stateMutability": "view",
+            "type": "function"
+        },
+        {
+            "inputs": [
+                {
+                    "internalType": "address",
+                    "name": "_user",
+                    "type": "address"
+                },
+                {
+                    "internalType": "string",
+                    "name": "_email",
+                    "type": "string"
+                }
+            ],
+            "name": "isContactVerified",
+            "outputs": [
+                {
+                    "internalType": "bool",
+                    "name": "",
+                    "type": "bool"
                 }
             ],
             "stateMutability": "view",
@@ -1946,16 +1847,21 @@ const messageContract = {
             "inputs": [
                 {
                     "internalType": "string",
-                    "name": "_senderEmail",
+                    "name": "_email",
                     "type": "string"
                 },
                 {
-                    "internalType": "bool",
-                    "name": "_status",
-                    "type": "bool"
+                    "internalType": "string",
+                    "name": "_chainId",
+                    "type": "string"
+                },
+                {
+                    "internalType": "address",
+                    "name": "_contact",
+                    "type": "address"
                 }
             ],
-            "name": "provideAttestation",
+            "name": "requestVerification",
             "outputs": [],
             "stateMutability": "nonpayable",
             "type": "function"
@@ -2002,21 +1908,21 @@ const messageContract = {
             "inputs": [
                 {
                     "internalType": "address",
-                    "name": "_receiver",
+                    "name": "_user",
                     "type": "address"
                 },
                 {
                     "internalType": "string",
-                    "name": "_receiverEmail",
+                    "name": "_email",
                     "type": "string"
                 },
                 {
                     "internalType": "bool",
-                    "name": "_attestation",
+                    "name": "_status",
                     "type": "bool"
                 }
             ],
-            "name": "setAttestation",
+            "name": "setContactVerified",
             "outputs": [],
             "stateMutability": "nonpayable",
             "type": "function"
@@ -2104,6 +2010,11 @@ const messageContract = {
                     "internalType": "string",
                     "name": "chainId",
                     "type": "string"
+                },
+                {
+                    "internalType": "bool",
+                    "name": "verified",
+                    "type": "bool"
                 }
             ],
             "stateMutability": "view",
@@ -2147,6 +2058,64 @@ const messageContract = {
                     "internalType": "uint256",
                     "name": "",
                     "type": "uint256"
+                }
+            ],
+            "stateMutability": "view",
+            "type": "function"
+        },
+        {
+            "inputs": [
+                {
+                    "internalType": "address",
+                    "name": "",
+                    "type": "address"
+                },
+                {
+                    "internalType": "uint256",
+                    "name": "",
+                    "type": "uint256"
+                }
+            ],
+            "name": "userVerificationRequests",
+            "outputs": [
+                {
+                    "internalType": "uint256",
+                    "name": "",
+                    "type": "uint256"
+                }
+            ],
+            "stateMutability": "view",
+            "type": "function"
+        },
+        {
+            "inputs": [
+                {
+                    "internalType": "uint256",
+                    "name": "",
+                    "type": "uint256"
+                }
+            ],
+            "name": "verificationRequests",
+            "outputs": [
+                {
+                    "internalType": "address",
+                    "name": "requester",
+                    "type": "address"
+                },
+                {
+                    "internalType": "string",
+                    "name": "email",
+                    "type": "string"
+                },
+                {
+                    "internalType": "string",
+                    "name": "chainId",
+                    "type": "string"
+                },
+                {
+                    "internalType": "address",
+                    "name": "contact",
+                    "type": "address"
                 }
             ],
             "stateMutability": "view",
