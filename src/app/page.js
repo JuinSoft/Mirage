@@ -65,7 +65,7 @@ export default function Home() {
   const [message, setMessage] = useState('Hello world');
   const [attachment, setAttachment] = useState(null);
   const [usdcAmount, setUsdcAmount] = useState('1');
-  const [showContacts, setShowContacts] = useState(false); 
+  const [showContacts, setShowContacts] = useState(false);
   const { user, handleLogOut } = useDynamicContext();
   const router = useRouter();
   const { provider, signer, contracts } = useContracts();
@@ -222,6 +222,15 @@ export default function Home() {
                 <span className="ml-2">{item.label}</span>
               </motion.div>
             ))}
+            <hr className="my-4 border-gray-600" />
+            <motion.div
+              whileHover={{ x: 5 }}
+              onClick={() => setActiveTab('Contacts')}
+              className={`flex items-center py-2 px-4 rounded-lg mb-2 cursor-pointer ${activeTab === 'Contacts' ? 'bg-[#D63C5E]' : ''}`}
+            >
+              <img src="/assets_png/traits-svg/3-heads/head-cordlessphone.svg" width="32" height="32" alt="Contacts" style={{ transform: 'rotate(90deg)' }} className="mr-2" />
+              <span className="ml-2">Contacts</span>
+            </motion.div>
           </nav>
         </motion.div>
         <div className="flex-1 flex flex-col">
@@ -232,10 +241,10 @@ export default function Home() {
             className="bg-white text-[#121212] p-4 flex justify-between items-center"
           >
             <div className="flex space-x-4">
-              <button className="px-4 py-2 rounded-full flex items-center bg-gray-200" onClick={() => setShowContacts(true)}>
+              {/* <button className="px-4 py-2 rounded-full flex items-center bg-gray-200" onClick={() => setShowContacts(true)}>
                 <img src="/assets_png/traits-svg/3-heads/head-cordlessphone.svg" width="32" height="32" alt="Spam" style={{ transform: 'rotate(90deg)' }} className="mr-2" />
                 Contacts
-              </button>
+              </button> */}
               {/* <button
               className={`px-4 py-2 rounded-full ${activeTab === 'Subscription' ? 'bg-[#D63C5E] text-white' : 'bg-gray-200'}`}
               onClick={() => setActiveTab('Subscription')}
@@ -347,42 +356,43 @@ export default function Home() {
                   </div>
                 </motion.div>
               ) : (
-                <motion.div
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  exit={{ opacity: 0 }}
-                  transition={{ duration: 0.5 }}
-                >
-                  <h2 className="text-2xl font-bold mb-4 text-[#121212]">{activeTab}</h2>
-                  {activeTab === 'Inbox' && (
-                    <div>
-                      {dummyEmails.map((email) => (
-                        <motion.div
-                          key={email.id}
-                          whileHover={{ scale: 1.02 }}
-                          onClick={() => setSelectedEmail(email)}
-                          className="bg-white p-4 rounded-lg shadow mb-4 cursor-pointer"
-                        >
-                          <div className="flex justify-between items-center">
-                            <div>
-                              <h3 className="text-lg font-bold text-[#121212]">{email.from}</h3>
-                              <p className="text-sm text-gray-600">{email.subject}</p>
+                <>
+                  <motion.div
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    transition={{ duration: 0.5 }}
+                  >
+                    <h2 className="text-2xl font-bold mb-4 text-[#121212]">{activeTab}</h2>
+                    {activeTab === 'Inbox' && (
+                      <div>
+                        {dummyEmails.map((email) => (
+                          <motion.div
+                            key={email.id}
+                            whileHover={{ scale: 1.02 }}
+                            onClick={() => setSelectedEmail(email)}
+                            className="bg-white p-4 rounded-lg shadow mb-4 cursor-pointer"
+                          >
+                            <div className="flex justify-between items-center">
+                              <div>
+                                <h3 className="text-lg font-bold text-[#121212]">{email.from}</h3>
+                                <p className="text-sm text-gray-600">{email.subject}</p>
+                              </div>
+                              <span className="text-sm text-gray-400">{email.date}</span>
                             </div>
-                            <span className="text-sm text-gray-400">{email.date}</span>
-                          </div>
-                          <p className="text-sm text-gray-600 mt-2">{email.preview}</p>
-                        </motion.div>
-                      ))}
-                    </div>
-                  )}
-                  {/* Add other tabs content here */}
-                </motion.div>
+                            <p className="text-sm text-gray-600 mt-2">{email.preview}</p>
+                          </motion.div>
+                        ))}
+                      </div>
+                    )}
+                    {activeTab === 'Contacts' && <ContactManager />}
+                  </motion.div>
+                </>
               )}
             </AnimatePresence>
           </main>
         </div>
       </div>
-      {showContacts && <ContactManager onClose={() => setShowContacts(false)} />}
       <ToastContainer />
     </>
   );
