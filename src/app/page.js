@@ -1,8 +1,10 @@
 'use client'
 
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Bell, Gift, Settings, User, MessageSquare, ChevronDown, Search, Paperclip, Send } from 'lucide-react'
+import { DynamicWidget, useDynamicContext } from '@dynamic-labs/sdk-react-core';
+import { useRouter } from 'next/navigation';
 
 const sidebarItems = [
   {
@@ -52,6 +54,25 @@ export default function Home() {
   const [showCompose, setShowCompose] = useState(false)
   const [selectedEmail, setSelectedEmail] = useState(null)
   const [selectedNetwork, setSelectedNetwork] = useState('Ethereum')
+  const { user, handleLogOut } = useDynamicContext();
+  const router = useRouter();
+
+
+  useEffect(() => {
+    if (!user) {
+      console.log("Not authenticated, redirecting to login");
+      router.push('/login');
+    }
+  }, [user, router]);
+
+  if (!user) {
+    return null;
+  }
+
+  const handleLogout = () => {
+    handleLogOut();
+    router.push('/login');
+  }
 
   return (
     <div className="flex h-screen bg-[#D63C5E] text-white font-sans">
@@ -100,27 +121,27 @@ export default function Home() {
           className="bg-white text-[#121212] p-4 flex justify-between items-center"
         >
           <div className="flex space-x-4">
-            <button
+            {/* <button
               className={`px-4 py-2 rounded-full ${activeTab === 'Mail' ? 'bg-[#D63C5E] text-white' : 'bg-gray-200'}`}
               onClick={() => setActiveTab('Mail')}
             >
               Mail
-            </button>
-            <button
+            </button> */}
+            {/* <button
               className={`px-4 py-2 rounded-full ${activeTab === 'Subscription' ? 'bg-[#D63C5E] text-white' : 'bg-gray-200'}`}
               onClick={() => setActiveTab('Subscription')}
             >
               Subscription
-            </button>
+            </button> */}
           </div>
           <div className="flex items-center space-x-4">
             <User size={24} />
-            <MessageSquare size={24} />
+            {/* <MessageSquare size={24} />
             <Bell size={24} />
-            <Gift size={24} />
-            <Settings size={24} />
+            <Gift size={24} /> */}
+            {/* <Settings size={24} /> */}
             <div className="bg-gray-200 text-[#121212] px-4 py-2 rounded-full text-sm">
-              0xa7c***08b5
+            <DynamicWidget />
             </div>
           </div>
         </motion.header>
