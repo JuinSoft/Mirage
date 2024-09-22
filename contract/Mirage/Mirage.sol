@@ -65,7 +65,6 @@ contract Mirage {
             isRead: false
         }));
         userMessages[_receiver].push(messageId);
-        userMessages[msg.sender].push(messageId); // Add message to sender's message list
         emit MessageSent(msg.sender, _receiver, messageId);
     }
 
@@ -156,7 +155,6 @@ contract Mirage {
 
     function getMessageById(uint256 messageId) public view returns (Message memory) {
         require(messageId < messages.length, "Message does not exist");
-        require(isVerified[messageId], "Message is not verified");
         return messages[messageId];
     }
 
@@ -175,7 +173,7 @@ contract Mirage {
 
         for (uint256 i = 0; i < messageIds.length; i++) {
             Message storage message = messages[messageIds[i]];
-            if (!message.isDeleted && isVerified[messageIds[i]]) {
+            if (!message.isDeleted && message.receiver == msg.sender) {
                 inbox[counter] = message;
                 counter++;
             }

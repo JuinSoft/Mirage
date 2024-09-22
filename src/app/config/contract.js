@@ -1293,7 +1293,7 @@ const stakerContract = {
 
 const messageContract = {
     name: "Mirage",
-    address: "0x719CB4fB145d08CB2Ef7E2608DF17aAAf8Edd4eD",  // Deployed on Ethereum Sepolia
+    address: "0x64921DA6062dC346311509335d7cF590d58F977A",  // Deployed on Ethereum Sepolia
     abi: [
         {
             "anonymous": false,

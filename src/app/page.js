@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Bell, Gift, Settings, User, MessageSquare, ChevronDown, Search, Paperclip, Send, X } from 'lucide-react';
+import { Bell, Gift, Settings, User, MessageSquare, ChevronDown, Search, Paperclip, Send, X, RefreshCw } from 'lucide-react';
 import { DynamicWidget, useDynamicContext, useSwitchNetwork } from '@dynamic-labs/sdk-react-core';
 import { useRouter } from 'next/navigation';
 import useContracts from './hooks/useContracts';
@@ -64,8 +64,11 @@ export default function Home() {
   const [subject, setSubject] = useState('Test');
   const [message, setMessage] = useState('Hello world');
   const [attachment, setAttachment] = useState(null);
-  const [usdcAmount, setUsdcAmount] = useState('1');
+  const [usdcAmount, setUsdcAmount] = useState('');
   const [showContacts, setShowContacts] = useState(false);
+  const [showModal, setShowModal] = useState(false);
+  const [modalMessage, setModalMessage] = useState(null);
+  const [messages, setMessages] = useState([]);
   const { user, handleLogOut } = useDynamicContext();
   const router = useRouter();
   const { provider, signer, contracts } = useContracts();
@@ -88,6 +91,15 @@ export default function Home() {
     router.push('/login');
   };
 
+  const handleMessageClick = (message) => {
+    setModalMessage(message);
+    setShowModal(true);
+  };
+
+  const closeModal = () => {
+    setShowModal(false);
+    setModalMessage(null);
+  };
 
   const handleSwitchNetwork = async (networkId) => {
     try {
@@ -105,52 +117,73 @@ export default function Home() {
   };
 
 
+  // Replace it with contract call -> getUserAccount(email) : It returns user address mapped to the email
+  // This is just a temporary solution
+  const emailToAddressMap = {
+    'jintuisbusy@gmail.com': '0x1704e5Dc4Eff82c9218Ded9a5864B2080b6428be',
+    'sonaliisbusy@gmail.com': '0x0f71ED6f979D4f40Cd15EcFcac0eEafB6a8Afd42',
+  };
+
+  const fetchRecentMessages = async () => {
+    try {
+      const userAddress = await signer.getAddress();
+      console.log("User address: ", userAddress);
+      const messages = await contracts.messageContract.getUserInbox(userAddress);
+      setMessages(messages);
+      console.log("Fetched messages: ", messages);
+    } catch (error) {
+      console.error('Error fetching messages:', error);
+      toast.error('Error fetching messages.');
+    }
+  };
+
 
   const handleSendMessage = async () => {
     try {
-      if (!to || !subject || !message) {
+      if (!subject || !message) {
         toast.error('Please fill in all required fields.');
         return;
       }
 
+      let walletAddress;
+      if (ethers.utils.isAddress(to)) {
+        walletAddress = to;
+      } else {
+        walletAddress = emailToAddressMap[to.toLowerCase()];
+        if (!walletAddress) {
+          toast.error('Invalid recipient email address.');
+          return;
+        }
+      }
+
+      console.log("Wallet address: ", walletAddress);
+
+
       let attachmentUrl = '';
+      let sendUSDC = true;
       if (attachment) {
-        const { url } = "test" // await sendFileToIPFS(attachment);
+        const { url } = await sendFileToIPFS(attachment);
         attachmentUrl = url;
         console.log("Attachment URL:", attachmentUrl);
       }
 
-      if (usdcAmount) {
-        // Switch to Polygon Amoy network
-        // await window.ethereum.request({
-        //   method: 'wallet_switchEthereumChain',
-        //   params: [{ chainId: '0x13882' }], // Polygon Amoy chain ID in hexadecimal
-        // });
-
-        // const tx = await contracts.senderContract.sendMessagePayLINK(
-        //   ethers.BigNumber.from("16015286601757825753"), // Ethereum Sepolia chain selector
-        //   to,
-        //   ethers.BigNumber.from("1000000") // 1 USDC
-        // );
-        // await tx.wait();
-        // console.log("Transaction sent successfully:", tx);
-        // await switchNetwork(POLYGON_AMAY_CHAIN_ID);
-
-        // await for 2 seconds
+      // Send USDC if the its enabled
+      if (usdcAmount && !sendUSDC) {
         const switchedToPolygon = await handleSwitchNetwork(POLYGON_AMAY_CHAIN_ID);
         if (!switchedToPolygon) {
           toast.error('Failed to switch to Polygon network.');
           return;
         }
-        await new Promise(resolve => setTimeout(resolve, 2000));
+        const tx = await contracts.senderContract.sendMessagePayLINK(
+          ethers.BigNumber.from("16015286601757825753"), // Ethereum Sepolia chain selector
+          walletAddress,
+          ethers.BigNumber.from("1000000") // 1 USDC
+        );
+
+        await tx.wait();
+        console.log("Transaction sent successfully:", tx);
         console.log("Transaction sent successfully after 2 seconds for Polygon Amoy: ", ethers.utils.parseUnits(usdcAmount || '0', 6));
       }
-
-      // Switch to Ethereum Sepolia network
-      // const switchNetwork = await window.ethereum.request({
-      //   method: 'wallet_switchEthereumChain',
-      //   params: [{ chainId: '0xaa36a7' }], // Ethereum Sepolia chain ID in hexadecimal
-      // });
 
       const switchedToEthereum = await handleSwitchNetwork(ETHEREUM_SEPOLIA_CHAIN_ID);
       if (!switchedToEthereum) {
@@ -159,7 +192,7 @@ export default function Home() {
       }
 
       const tx = await contracts.messageContract.sendMessage(
-        to,
+        walletAddress,
         subject,
         message,
         attachmentUrl,
@@ -193,11 +226,6 @@ export default function Home() {
           className="w-64 bg-[#121212] p-4 flex flex-col"
         >
           <div className="flex items-center mb-8">
-            {/* <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg" className="mr-2">
-              <rect width="32" height="32" rx="4" fill="#D63C5E" />
-              <path d="M8 8H24V24H8V8Z" fill="white" />
-              <path d="M12 12H20V20H12V12Z" fill="#D63C5E" />
-            </svg> */}
             <img src="/assets_png/traits-svg/3-heads/head-crystalball.svg" width="50" height="50" alt="Mirage" />
             <h1 className="text-2xl font-bold">Mirage</h1>
           </div>
@@ -254,6 +282,9 @@ export default function Home() {
             </div>
             <div className="flex items-center space-x-4">
               {/* {randomImage && <img src={randomImage} alt="Random Profile" width={24} height={24} />} */}
+              <button onClick={fetchRecentMessages} className="bg-gray-200 text-[#121212] px-4 py-2 rounded-full text-sm">
+                <RefreshCw size={24} />
+              </button>
               <User size={24} />
               {/* <MessageSquare size={24} />
             <Bell size={24} />
@@ -292,7 +323,10 @@ export default function Home() {
                       onChange={(e) => setTo(e.target.value)}
                       className="flex-grow p-2 border border-gray-300 rounded mr-2 text-[#121212]"
                     />
-                    <div className="relative">
+                    {emailToAddressMap[to.toLowerCase()] && (
+                      <span className="text-green-500">{emailToAddressMap[to.toLowerCase()]}</span>
+                    )}
+                    {/* <div className="relative">
                       <select
                         value={selectedNetwork}
                         onChange={(e) => setSelectedNetwork(e.target.value)}
@@ -303,7 +337,7 @@ export default function Home() {
                         <option>Optimism</option>
                       </select>
                       <ChevronDown className="absolute right-2 top-1/2 transform -translate-y-1/2 pointer-events-none" size={16} />
-                    </div>
+                    </div> */}
                   </div>
                   <input
                     type="text"
@@ -366,6 +400,26 @@ export default function Home() {
                     <h2 className="text-2xl font-bold mb-4 text-[#121212]">{activeTab}</h2>
                     {activeTab === 'Inbox' && (
                       <div>
+                        {messages.map((message, index) => (
+                          <motion.div
+                            key={index}
+                            whileHover={{ scale: 1.02 }}
+                            onClick={() => handleMessageClick(message)}
+                            className="bg-white p-4 rounded-lg shadow mb-4 cursor-pointer"
+                          >
+                            <div className="flex justify-between items-center">
+                              <div>
+                                <h3 className="text-lg font-bold text-[#121212]">{message.sender}</h3>
+                                <p className="text-sm text-gray-600">{message.subject}</p>
+                              </div>
+                              <span className="text-sm text-gray-400">{new Date(message.timestamp * 1000).toLocaleString()}</span>
+                            </div>
+                            <p className="text-sm text-gray-600 mt-2">{message.content}</p>
+                            {message.imageHash && (
+                              <img src={`https://ipfs.io/ipfs/${message.imageHash}`} alt="Attachment" className="mt-2" />
+                            )}
+                          </motion.div>
+                        ))}
                         {dummyEmails.map((email) => (
                           <motion.div
                             key={email.id}
@@ -386,6 +440,11 @@ export default function Home() {
                       </div>
                     )}
                     {activeTab === 'Contacts' && <ContactManager />}
+                    {activeTab !== 'Inbox' && activeTab !== 'Contacts' && (
+                      <div className="text-center text-gray-600">
+                        <p className="text-lg">Not yet implemented</p>
+                      </div>
+                    )}
                   </motion.div>
                 </>
               )}
@@ -393,7 +452,45 @@ export default function Home() {
           </main>
         </div>
       </div>
+      {showModal && (
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.5 }}
+          className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center"
+        >
+          <div className="bg-white p-6 rounded-lg shadow-lg relative">
+            <button
+              className="absolute top-2 right-2 text-gray-500 hover:text-gray-700"
+              onClick={closeModal}
+            >
+              <X size={24} />
+            </button>
+            <h2 className="text-2xl font-bold mb-4 text-[#121212]">{modalMessage.subject}</h2>
+            <p className="text-sm text-gray-600 mb-4"><strong>From:</strong> {modalMessage.sender}</p>
+            <p className="text-sm text-gray-600 mb-4"><strong>To:</strong> {modalMessage.receiver}</p>
+            <p className="text-sm text-gray-600 mb-4"><strong>Message:</strong> {modalMessage.content}</p>
+            {modalMessage.imageHash && (
+              <>
+                <img src={`${modalMessage.imageHash}`} alt="Attachment" className="mt-2" />
+              </>
+            )}
+          </div>
+        </motion.div>
+      )}
       <ToastContainer />
+      {/* Partners Section */}
+      <div className="bg-white p-8 mt-8">
+        <h2 className="text-2xl font-bold mb-4 text-[#121212]">Our Partners</h2>
+        <div className="flex justify-around items-center">
+          <img src="/assets_png/dynamic.png" alt="Dynamic" width="100" height="100" />
+          <img src="/assets_png/nounsDAO.png" alt="NounsDAO" width="100" height="100" />
+          <img src="/assets_png/signProtocol.png" alt="Sign Protocol" width="100" height="100" />
+          <img src="/assets_png/chainlink.png" alt="Chainlink" width="100" height="100" />
+          <img src="/assets_png/circle.png" alt="Circle" width="100" height="100" />
+        </div>
+      </div>
     </>
   );
 }
